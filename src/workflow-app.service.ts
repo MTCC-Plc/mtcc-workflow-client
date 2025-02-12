@@ -14,30 +14,53 @@ export class WorkflowAppService {
     this.appId = Number(process.env.WORKFLOW_API_ID) || 0;
     this.privateToken = process.env.WORKFLOW_API_PRIVATE_TOKEN || '';
 
-    if (!this.workflowApiUrl || !this.privateToken || !this.appId) {
-      throw new Error('Missing required environment variables for WorkflowAppService');
-    }
+    this.validateEnvVariables();
   }
+
+   private validateEnvVariables() {
+        const missingVars = [];
+
+        if (!this.workflowApiUrl) missingVars.push('WORKFLOW_API_URL');
+        if (!this.appId) missingVars.push('WORKFLOW_API_ID');
+        if (!this.privateToken) missingVars.push('WORKFLOW_API_PRIVATE_TOKEN');
+
+        if (missingVars.length > 0) {
+        throw new Error(
+            `🚨 Missing required environment variables: ${missingVars.join(', ')}. ` +
+            `\nEnsure these variables are set in your .env file or system environment.`
+        );
+        }
+    }
 
   private async fetchGraphQL(query: object) {
     try {
-      const response = await axios.post(this.workflowApiUrl, JSON.stringify(query), {
+        const response = await axios.post(this.workflowApiUrl, JSON.stringify(query), {
         headers: {
-          Authorization: `Bearer ${this.getToken()}`,
-          'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.getToken()}`,
+            'Content-Type': 'application/json',
         },
-      });
+        });
 
-      if (response.status !== 200) {
+        if (response.status !== 200) {
         throw new Error(`Unexpected response status: ${response.status}`);
-      }
+        }
 
-      return response.data.data;
-    } catch (error) {
-      console.error('GraphQL API Error:', error);
-      throw new Error('Failed to fetch data from Workflow API');
+        return response.data.data;
+    } catch (error: any) {
+        if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+            throw new Error(
+            `🚨 Authentication Failed: Invalid or unauthorized API token. ` +
+            `\n📌 Check your WORKFLOW_API_PRIVATE_TOKEN in .env or your API credentials.`
+            );
+        }
+        }
+
+        console.error('GraphQL API Error:', error);
+        throw new Error('Failed to fetch data from Workflow API');
     }
-  }
+    }
+
 
   async getAppWorkflows(): Promise<WorkflowApp[]> {
     const query = {
@@ -188,10 +211,19 @@ export class WorkflowAppService {
   }
 
   private getToken(): string {
-    return jwt.sign(
-      { sub: this.appId, type: 'app' },
-      Buffer.from(this.privateToken, 'base64').toString('ascii'),
-      { algorithm: 'RS256' }
-    );
-  }
+    try {
+        const token = jwt.sign(
+        { sub: this.appId, type: 'app' },
+        Buffer.from(this.privateToken, 'base64').toString('ascii'),
+        { algorithm: 'RS256' }
+        );
+
+        return token;
+    } catch (error) {
+        throw new Error(
+        `🚨 JWT Signing Failed: Your WORKFLOW_API_PRIVATE_TOKEN is incorrect or not a valid private key.` +
+        `\n📌 Ensure your private key is Base64-encoded and correct.`
+        );
+    }
+    }
 }
