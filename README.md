@@ -4,8 +4,6 @@
 
 ## 📌 **Installation**
 
-Since this package is hosted on **GitHub**, install it directly from the repository:
-
 ### **Using NPM**
 
 ````sh
@@ -175,8 +173,6 @@ const workflowService = new WorkflowAppService();
 ---
 
 ## 📌 **Environment Variables**
-
-This package **does not load `.env` automatically**. The application using this package **must** load environment variables before instantiating `WorkflowAppService`.
 
 | Variable                     | Description                                          |
 | ---------------------------- | ---------------------------------------------------- |
