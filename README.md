@@ -1,17 +1,15 @@
-# 🚀 Workflow App SDK
-
-**Workflow App SDK** is a lightweight, standalone Node.js package for interacting with a Workflow API.  
-It provides methods to fetch workflows, pending requests, and single request details using GraphQL.
+# 🚀 Internal Workflow App Client
 
 ---
 
 ## 📌 **Installation**
 
-Install the package using npm:
+Since this package is hosted on **GitHub**, install it directly from the repository:
 
-```sh
-npm install workflow-app-sdk
-```
+### **Using NPM**
+
+````sh
+npm install git+https://github.com/MTCC-Plc/mtcc-workflow-client.git
 
 ---
 
@@ -20,10 +18,10 @@ npm install workflow-app-sdk
 Before using the package, **create a `.env` file** in your application and define the required environment variables:
 
 ```env
-WORKFLOW_API_URL=https://your-api.com/graphql
+WORKFLOW_API_URL=https://dev-api-workflow.mtcc.com.mv/graphql
 WORKFLOW_API_ID=12345
 WORKFLOW_API_PRIVATE_TOKEN=your-private-token
-```
+````
 
 Then, load environment variables at the start of your application:
 
@@ -187,22 +185,3 @@ This package **does not load `.env` automatically**. The application using this 
 | `WORKFLOW_API_PRIVATE_TOKEN` | The private API token for JWT authentication.        |
 
 ---
-
-## 🔧 **Development & Contribution**
-
-### 🛠 **Build the Package**
-
-To compile TypeScript and generate the `dist/` folder:
-
-```sh
-npx tsc
-```
-
-### 🚀 **Publish to NPM**
-
-To publish an updated version of the package:
-
-```sh
-npm version patch
-npm publish --access public
-```
