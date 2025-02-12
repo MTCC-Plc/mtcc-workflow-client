@@ -26,8 +26,8 @@ export class WorkflowAppService {
 
         if (missingVars.length > 0) {
         throw new Error(
-            `🚨 Missing required environment variables: ${missingVars.join(', ')}. ` +
-            `\nEnsure these variables are set in your .env file or system environment.`
+            `Missing required environment variables: ${missingVars.join(', ')}. ` +
+            `\n Ensure these variables are set in your .env file or system environment.`
         );
         }
     }
@@ -50,8 +50,8 @@ export class WorkflowAppService {
         if (error.response) {
         if (error.response.status === 401 || error.response.status === 403) {
             throw new Error(
-            `🚨 Authentication Failed: Invalid or unauthorized API token. ` +
-            `\n📌 Check your WORKFLOW_API_PRIVATE_TOKEN in .env or your API credentials.`
+            `Authentication Failed: Invalid or unauthorized API token. ` +
+            `\n Check your WORKFLOW_API_PRIVATE_TOKEN in .env or your API credentials.`
             );
         }
         }
@@ -221,8 +221,8 @@ export class WorkflowAppService {
         return token;
     } catch (error) {
         throw new Error(
-        `🚨 JWT Signing Failed: Your WORKFLOW_API_PRIVATE_TOKEN is incorrect or not a valid private key.` +
-        `\n📌 Ensure your private key is Base64-encoded and correct.`
+        `JWT Signing Failed: Your WORKFLOW_API_PRIVATE_TOKEN is incorrect or not a valid private key.` +
+        `\n Ensure your private key is Base64-encoded and correct.`
         );
     }
     }
