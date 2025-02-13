@@ -142,6 +142,25 @@ export class WorkflowAppService {
                 isReceived
                 createdAt
                 updatedAt
+                workflow {
+                    id
+                    workflowName
+                    allowMultipleApprovers
+                    workflowSteps {
+                        id
+                        stepName
+                        position
+                        workflowStepActionAllowedUsers {
+                            id
+                            user {
+                                userId
+                                rcno
+                                fullName
+                                email
+                            }
+                        }
+                    }
+                }
                 workflowRequestSteps {
                     id
                     actionTakenDate
