@@ -97,6 +97,16 @@ export class WorkflowAppService {
             isCompleted
             isReceived
             requestId
+            workflowRequestSteps {
+                id
+                state
+                userId
+                workflowStep {
+                    stepName
+                    position
+                    description
+                }
+            }
           }
         }
       `,
