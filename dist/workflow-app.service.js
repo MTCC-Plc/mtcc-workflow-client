@@ -153,6 +153,7 @@ class WorkflowAppService {
                             id
                             approverPriority
                             user {
+                                id
                                 userId
                                 rcno
                                 fullName
