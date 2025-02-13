@@ -151,6 +151,7 @@ class WorkflowAppService {
                         position
                         workflowStepActionAllowedUsers {
                             id
+                            approverPriority
                             user {
                                 userId
                                 rcno
