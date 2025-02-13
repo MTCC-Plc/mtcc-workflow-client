@@ -131,7 +131,7 @@ export class WorkflowAppService {
   async workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest | null> {
     const query = {
         operationName: 'workflowRequestById',
-        variables: { id },
+        variables: { requestId: id },
         query: `
         query workflowRequestById($id: String!) {
             workflowRequestById(id: $id) {
