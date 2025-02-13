@@ -130,7 +130,7 @@ class WorkflowAppService {
         return __awaiter(this, void 0, void 0, function* () {
             const query = {
                 operationName: 'workflowRequestById',
-                variables: { requestId: id },
+                variables: { id },
                 query: `
         query workflowRequestById($id: String!) {
             workflowRequestById(id: $id) {
