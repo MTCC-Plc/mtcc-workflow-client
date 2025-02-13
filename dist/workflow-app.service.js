@@ -132,19 +132,46 @@ class WorkflowAppService {
                 operationName: 'workflowRequestById',
                 variables: { id },
                 query: `
-            query workflowRequestById($id: String!) {
-                workflowRequestById(id: $id) {
+        query workflowRequestById($id: String!) {
+            workflowRequestById(id: $id) {
                 id
-                isCompleted
-                isReceived
                 requestId
                 requestDetails
+                isCompleted
+                isReceived
+                createdAt
+                updatedAt
+                workflowRequestSteps {
+                    id
+                    actionTakenDate
+                    remarks
+                    state
+                    createdAt
+                    updatedAt
+                    actionTakenBy {
+                        id
+                        fullName
+                        userId
+                        email
+                        rcno
+                    }
                 }
             }
-            `,
+        }
+        `,
             };
-            const data = yield this.fetchGraphQL(query);
-            return Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), (data === null || data === void 0 ? void 0 : data.workflowRequestById) || {});
+            try {
+                const data = yield this.fetchGraphQL(query);
+                if (!(data === null || data === void 0 ? void 0 : data.workflowRequestById)) {
+                    console.warn(`No workflow request found for ID: ${id}`);
+                    return null;
+                }
+                return Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), data.workflowRequestById);
+            }
+            catch (error) {
+                console.error(`Failed to fetch workflow request for ID: ${id}`, error);
+                throw new Error('Error retrieving workflow request.');
+            }
         });
     }
     createWorkflowRequest(userId_1, requestId_1, workflowId_1, requestDetails_1) {

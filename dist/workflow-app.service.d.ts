@@ -10,7 +10,7 @@ export declare class WorkflowAppService {
     getAppWorkflows(): Promise<WorkflowApp[]>;
     getUserPendingRequests(userId: string): Promise<WorkflowAppRequest[]>;
     getSingleWorkflowRequest(requestId: number): Promise<WorkflowAppRequest>;
-    workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest>;
+    workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest | null>;
     createWorkflowRequest(userId: string | null, requestId: string, workflowId: number, requestDetails: string, isEmployee?: boolean): Promise<string>;
     getPendingActions(userId: string): Promise<{
         appName: string;
