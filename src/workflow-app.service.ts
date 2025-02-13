@@ -128,25 +128,55 @@ export class WorkflowAppService {
     return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
   }
 
-  async workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest> {
+  async workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest | null> {
     const query = {
         operationName: 'workflowRequestById',
         variables: { id },
         query: `
-            query workflowRequestById($id: String!) {
-                workflowRequestById(id: $id) {
+        query workflowRequestById($id: String!) {
+            workflowRequestById(id: $id) {
                 id
-                isCompleted
-                isReceived
                 requestId
                 requestDetails
+                isCompleted
+                isReceived
+                createdAt
+                updatedAt
+                workflowRequestSteps {
+                    id
+                    actionTakenDate
+                    remarks
+                    state
+                    createdAt
+                    updatedAt
+                    actionTakenBy {
+                        id
+                        fullName
+                        userId
+                        email
+                        rcno
+                    }
                 }
             }
-            `,
+        }
+        `,
     };
-    const data = await this.fetchGraphQL(query);
-    return Object.assign(new WorkflowAppRequest(), data?.workflowRequestById || {});
-  }
+
+    try {
+        const data = await this.fetchGraphQL(query);
+
+        if (!data?.workflowRequestById) {
+        console.warn(`No workflow request found for ID: ${id}`);
+        return null;
+        }
+
+        return Object.assign(new WorkflowAppRequest(), data.workflowRequestById);
+    } catch (error) {
+        console.error(`Failed to fetch workflow request for ID: ${id}`, error);
+        throw new Error('Error retrieving workflow request.');
+    }
+    }
+
 
   async createWorkflowRequest(
     userId: string | null,
