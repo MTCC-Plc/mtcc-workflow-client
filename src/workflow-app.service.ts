@@ -124,16 +124,36 @@ export class WorkflowAppService {
         }
       `,
     };
-
     const data = await this.fetchGraphQL(query);
     return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
   }
 
+  async workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest> {
+    const query = {
+        operationName: 'workflowRequestById',
+        variables: { id },
+        query: `
+            query workflowRequestById($id: String!) {
+                workflowRequestById(id: $id) {
+                id
+                isCompleted
+                isReceived
+                requestId
+                requestDetails
+                }
+            }
+            `,
+    };
+    const data = await this.fetchGraphQL(query);
+    return Object.assign(new WorkflowAppRequest(), data?.workflowRequestById || {});
+  }
+
   async createWorkflowRequest(
-    userId: string,
+    userId: string | null,
     requestId: string,
     workflowId: number,
-    requestDetails: string
+    requestDetails: string,
+    isEmployee: boolean = true
   ): Promise<string> {
     const query = {
       operationName: 'createWorkflowRequest',
@@ -142,10 +162,10 @@ export class WorkflowAppService {
           appId: this.appId,
           requestDetails,
           requestId,
-          userId,
+          userId: isEmployee ? null : userId,
           workflowId,
         },
-        isEmployee: true,
+        ...(isEmployee !== undefined && { isEmployee }),
       },
       query: `
         mutation createWorkflowRequest($createWorkflowRequestInput: CreateWorkflowRequestInput!, $isEmployee: Boolean) {
@@ -208,6 +228,36 @@ export class WorkflowAppService {
       console.error(error);
       throw new Error('Workflow Pending Actions Failed.');
     }
+  }
+
+  async workflowRequestTakeAction(
+    workflowStepId: number,
+    action: string,
+    remarks: string,
+    userId: string
+  ) {
+    const query = {
+      operationName: 'workflowRequestAction',
+      variables: {
+        workflowStepId,
+        action,
+        remarks,
+        userId,
+      },
+      query: `
+        mutation workflowRequestAction($workflowStepId: Int!, $action: Action!, $remarks: String!, $userId: String ) {
+            workflowRequestAction(workflowStepId: $workflowStepId, action: $action, remarks: $remarks, userId: $userId) {
+              id
+              isCompleted
+              isReceived
+              requestId
+              requestDetails
+            }
+          }
+        `,
+    };
+    const data = await this.fetchGraphQL(query);
+    return Object.assign(new WorkflowAppRequest(), data?.workflowRequestAction || {});
   }
 
   private getToken(): string {

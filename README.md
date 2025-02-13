@@ -1,4 +1,4 @@
-# 🚀 Internal Workflow App Client
+# Internal Workflow App Client
 
 ---
 
