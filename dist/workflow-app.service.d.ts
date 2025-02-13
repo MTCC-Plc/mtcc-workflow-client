@@ -5,11 +5,13 @@ export declare class WorkflowAppService {
     private readonly appId;
     private readonly privateToken;
     constructor();
+    private validateEnvVariables;
     private fetchGraphQL;
     getAppWorkflows(): Promise<WorkflowApp[]>;
     getUserPendingRequests(userId: string): Promise<WorkflowAppRequest[]>;
     getSingleWorkflowRequest(requestId: number): Promise<WorkflowAppRequest>;
-    createWorkflowRequest(userId: string, requestId: string, workflowId: number, requestDetails: string): Promise<string>;
+    workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest>;
+    createWorkflowRequest(userId: string | null, requestId: string, workflowId: number, requestDetails: string, isEmployee?: boolean): Promise<string>;
     getPendingActions(userId: string): Promise<{
         appName: string;
         actions: {
@@ -18,5 +20,6 @@ export declare class WorkflowAppService {
             link: string;
         }[];
     }>;
+    workflowRequestTakeAction(workflowStepId: number, action: string, remarks: string, userId: string): Promise<any>;
     private getToken;
 }

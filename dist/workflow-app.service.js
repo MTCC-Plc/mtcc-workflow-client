@@ -20,8 +20,19 @@ class WorkflowAppService {
         this.workflowApiUrl = process.env.WORKFLOW_API_URL || '';
         this.appId = Number(process.env.WORKFLOW_API_ID) || 0;
         this.privateToken = process.env.WORKFLOW_API_PRIVATE_TOKEN || '';
-        if (!this.workflowApiUrl || !this.privateToken || !this.appId) {
-            throw new Error('Missing required environment variables for WorkflowAppService');
+        this.validateEnvVariables();
+    }
+    validateEnvVariables() {
+        const missingVars = [];
+        if (!this.workflowApiUrl)
+            missingVars.push('WORKFLOW_API_URL');
+        if (!this.appId)
+            missingVars.push('WORKFLOW_API_ID');
+        if (!this.privateToken)
+            missingVars.push('WORKFLOW_API_PRIVATE_TOKEN');
+        if (missingVars.length > 0) {
+            throw new Error(`Missing required environment variables: ${missingVars.join(', ')}. ` +
+                `\n Ensure these variables are set in your .env file or system environment.`);
         }
     }
     fetchGraphQL(query) {
@@ -39,6 +50,12 @@ class WorkflowAppService {
                 return response.data.data;
             }
             catch (error) {
+                if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                        throw new Error(`Authentication Failed: Invalid or unauthorized API token. ` +
+                            `\n Check your WORKFLOW_API_PRIVATE_TOKEN in .env or your API credentials.`);
+                    }
+                }
                 console.error('GraphQL API Error:', error);
                 throw new Error('Failed to fetch data from Workflow API');
             }
@@ -109,21 +126,39 @@ class WorkflowAppService {
             return Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), (data === null || data === void 0 ? void 0 : data.workflowRequest) || {});
         });
     }
-    createWorkflowRequest(userId, requestId, workflowId, requestDetails) {
+    workflowRequestByReferenceId(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            const query = {
+                operationName: 'workflowRequestById',
+                variables: { id },
+                query: `
+            query workflowRequestById($id: String!) {
+                workflowRequestById(id: $id) {
+                id
+                isCompleted
+                isReceived
+                requestId
+                requestDetails
+                }
+            }
+            `,
+            };
+            const data = yield this.fetchGraphQL(query);
+            return Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), (data === null || data === void 0 ? void 0 : data.workflowRequestById) || {});
+        });
+    }
+    createWorkflowRequest(userId_1, requestId_1, workflowId_1, requestDetails_1) {
+        return __awaiter(this, arguments, void 0, function* (userId, requestId, workflowId, requestDetails, isEmployee = true) {
             var _a;
             const query = {
                 operationName: 'createWorkflowRequest',
-                variables: {
-                    createWorkflowRequestInput: {
+                variables: Object.assign({ createWorkflowRequestInput: {
                         appId: this.appId,
                         requestDetails,
                         requestId,
-                        userId,
+                        userId: isEmployee ? null : userId,
                         workflowId,
-                    },
-                    isEmployee: true,
-                },
+                    } }, (isEmployee !== undefined && { isEmployee })),
                 query: `
         mutation createWorkflowRequest($createWorkflowRequestInput: CreateWorkflowRequestInput!, $isEmployee: Boolean) {
           createWorkflowRequest(createWorkflowRequestInput: $createWorkflowRequestInput, isEmployee: $isEmployee) {
@@ -183,8 +218,41 @@ class WorkflowAppService {
             }
         });
     }
+    workflowRequestTakeAction(workflowStepId, action, remarks, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = {
+                operationName: 'workflowRequestAction',
+                variables: {
+                    workflowStepId,
+                    action,
+                    remarks,
+                    userId,
+                },
+                query: `
+        mutation workflowRequestAction($workflowStepId: Int!, $action: Action!, $remarks: String!, $userId: String ) {
+            workflowRequestAction(workflowStepId: $workflowStepId, action: $action, remarks: $remarks, userId: $userId) {
+              id
+              isCompleted
+              isReceived
+              requestId
+              requestDetails
+            }
+          }
+        `,
+            };
+            const data = yield this.fetchGraphQL(query);
+            return Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), (data === null || data === void 0 ? void 0 : data.workflowRequestAction) || {});
+        });
+    }
     getToken() {
-        return jwt.sign({ sub: this.appId, type: 'app' }, Buffer.from(this.privateToken, 'base64').toString('ascii'), { algorithm: 'RS256' });
+        try {
+            const token = jwt.sign({ sub: this.appId, type: 'app' }, Buffer.from(this.privateToken, 'base64').toString('ascii'), { algorithm: 'RS256' });
+            return token;
+        }
+        catch (error) {
+            throw new Error(`JWT Signing Failed: Your WORKFLOW_API_PRIVATE_TOKEN is incorrect or not a valid private key.` +
+                `\n Ensure your private key is Base64-encoded and correct.`);
+        }
     }
 }
 exports.WorkflowAppService = WorkflowAppService;
