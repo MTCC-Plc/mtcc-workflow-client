@@ -97,6 +97,11 @@ class WorkflowAppService {
             isCompleted
             isReceived
             requestId
+            workflowRequestSteps {
+              id
+              actionTakenDate
+              workflowStepId
+            }
           }
         }
       `,
