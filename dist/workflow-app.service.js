@@ -140,6 +140,7 @@ class WorkflowAppService {
     // }
     getSingleWorkflowRequest(requestId) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const query = {
                 operationName: 'workflowRequest',
                 variables: { id: requestId },
@@ -159,12 +160,13 @@ class WorkflowAppService {
               actionTakenBy {
                 fullName
                 userId
+                email
               }
               workflowStep {
                 id
                 stepName
                 position
-                workflowStepActionAllowedUsers {
+                workflowStepActionAllowedUsers @include(if: $isPending) { # ✅ Only fetch if Pending
                   id
                   approverPriority
                   user {
@@ -180,6 +182,17 @@ class WorkflowAppService {
       `,
             };
             const data = yield this.fetchGraphQL(query);
+            // ✅ Transform the data to remove approvers from approved/rejected steps
+            if ((_a = data === null || data === void 0 ? void 0 : data.workflowRequest) === null || _a === void 0 ? void 0 : _a.workflowRequestSteps) {
+                data.workflowRequest.workflowRequestSteps = data.workflowRequest.workflowRequestSteps.map((step) => {
+                    var _a;
+                    const isStepApproved = step.state === 'Approve';
+                    const isStepRejected = step.state === 'Reject';
+                    return Object.assign(Object.assign({}, step), { workflowStep: Object.assign(Object.assign({}, step.workflowStep), { workflowStepActionAllowedUsers: isStepApproved || isStepRejected
+                                ? [] // ✅ Hide approvers if step is already approved/rejected
+                                : (_a = step.workflowStep) === null || _a === void 0 ? void 0 : _a.workflowStepActionAllowedUsers }) });
+                });
+            }
             return Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), (data === null || data === void 0 ? void 0 : data.workflowRequest) || {});
         });
     }

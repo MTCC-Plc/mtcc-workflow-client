@@ -141,7 +141,6 @@ export class WorkflowAppService {
   //   const data = await this.fetchGraphQL(query);
   //   return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
   // }
-
   async getSingleWorkflowRequest(requestId: number): Promise<WorkflowAppRequest> {
     const query = {
       operationName: 'workflowRequest',
@@ -162,12 +161,13 @@ export class WorkflowAppService {
               actionTakenBy {
                 fullName
                 userId
+                email
               }
               workflowStep {
                 id
                 stepName
                 position
-                workflowStepActionAllowedUsers {
+                workflowStepActionAllowedUsers @include(if: $isPending) { # ✅ Only fetch if Pending
                   id
                   approverPriority
                   user {
@@ -184,6 +184,25 @@ export class WorkflowAppService {
     };
 
     const data = await this.fetchGraphQL(query);
+
+    // ✅ Transform the data to remove approvers from approved/rejected steps
+    if (data?.workflowRequest?.workflowRequestSteps) {
+      data.workflowRequest.workflowRequestSteps = data.workflowRequest.workflowRequestSteps.map((step : any) => {
+        const isStepApproved = step.state === 'Approve';
+        const isStepRejected = step.state === 'Reject';
+
+        return {
+          ...step,
+          workflowStep: {
+            ...step.workflowStep,
+            workflowStepActionAllowedUsers: isStepApproved || isStepRejected
+              ? [] // ✅ Hide approvers if step is already approved/rejected
+              : step.workflowStep?.workflowStepActionAllowedUsers,
+          },
+        };
+      });
+    }
+
     return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
   }
 
