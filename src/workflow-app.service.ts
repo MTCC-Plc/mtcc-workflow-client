@@ -214,50 +214,39 @@ export class WorkflowAppService {
         query: `
         query workflowRequestById($id: String!) {
             workflowRequestById(id: $id) {
+              id
+              requestId
+              workflowRequestSteps {
                 id
-                requestId
-                requestDetails
-                isCompleted
-                isReceived
-                createdAt
-                updatedAt
-                workflow {
+                actionTakenDate
+                workflowStepId
+                workflowRequestId
+                remarks
+                state
+              }
+              isCompleted
+              workflow {
+                id
+                workflowName
+                isActive
+                workflowSteps {
+                  id
+                  stepName
+                  description
+                  position
+                  workflowStepActionAllowedUsers {
                     id
-                    workflowName
-                    allowMultipleApprovers
-                    workflowSteps {
-                        id
-                        stepName
-                        position
-                        workflowStepActionAllowedUsers {
-                            id
-                            approverPriority
-                            user {
-                                id
-                                userId
-                                rcno
-                                fullName
-                                email
-                            }
-                        }
+                    approverPriority
+                    user {
+                      id
+                      fullName
+                      userId
+                      email
+                      rcno
                     }
+                  }
                 }
-                workflowRequestSteps {
-                    id
-                    workflowStepId
-                    actionTakenDate
-                    remarks
-                    state
-                    createdAt
-                    updatedAt
-                    actionTakenBy {
-                        id
-                        fullName
-                        userId
-                        email
-                        rcno
-                    }
-                }
+              }
             }
         }
         `,
