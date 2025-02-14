@@ -125,6 +125,15 @@ export class WorkflowAppService {
             isReceived
             requestId
             requestDetails
+            workflowRequestSteps {
+              id
+              workflowStepId
+              state
+              actionTakenBy {
+                fullName
+                userId
+              }
+            }
           }
         }
       `,
