@@ -223,6 +223,13 @@ export class WorkflowAppService {
                 workflowRequestId
                 remarks
                 state
+                actionTakenBy {
+                  id
+                  fullName
+                  userId
+                  email
+                  rcno
+                }
               }
               isCompleted
               workflow {
