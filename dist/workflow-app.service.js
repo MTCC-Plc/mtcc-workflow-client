@@ -97,16 +97,6 @@ class WorkflowAppService {
             isCompleted
             isReceived
             requestId
-            workflowRequestSteps {
-                id
-                state
-                userId
-                workflowStep {
-                    stepName
-                    position
-                    description
-                }
-            }
           }
         }
       `,
@@ -170,6 +160,15 @@ class WorkflowAppService {
                                 email
                             }
                         }
+                       workflow {
+                         id 
+                         workflowName
+                         workflowSteps {
+                          id
+                          stepName
+                          position
+                         }
+                       }
                     }
                 }
                 workflowRequestSteps {
