@@ -110,6 +110,34 @@ class WorkflowAppService {
             return ((_a = data === null || data === void 0 ? void 0 : data.getUserPendingWorkflowRequestApproval) === null || _a === void 0 ? void 0 : _a.map((req) => Object.assign(new workflow_app_request_model_1.WorkflowAppRequest(), req))) || [];
         });
     }
+    // async getSingleWorkflowRequest(requestId: number): Promise<WorkflowAppRequest> {
+    //   const query = {
+    //     operationName: 'workflowRequest',
+    //     variables: { id: requestId },
+    //     query: `
+    //       query workflowRequest($id: Int!) {
+    //         workflowRequest(id: $id) {
+    //           id
+    //           isCompleted
+    //           isReceived
+    //           requestId
+    //           requestDetails
+    //           workflowRequestSteps {
+    //             id
+    //             workflowStepId
+    //             state
+    //             actionTakenBy {
+    //               fullName
+    //               userId
+    //             }
+    //           }
+    //         }
+    //       }
+    //     `,
+    //   };
+    //   const data = await this.fetchGraphQL(query);
+    //   return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
+    // }
     getSingleWorkflowRequest(requestId) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = {
@@ -123,6 +151,30 @@ class WorkflowAppService {
             isReceived
             requestId
             requestDetails
+            workflowRequestSteps {
+              id
+              workflowRequestId
+              workflowStepId
+              state
+              actionTakenBy {
+                fullName
+                userId
+              }
+              workflowStep {
+                id
+                stepName
+                position
+                workflowStepActionAllowedUsers {
+                  id
+                  approverPriority
+                  user {
+                    userId
+                    fullName
+                    email
+                  }
+                }
+              }
+            }
           }
         }
       `,

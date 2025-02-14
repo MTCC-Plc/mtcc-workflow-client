@@ -113,6 +113,35 @@ export class WorkflowAppService {
     ) || [];
   }
 
+  // async getSingleWorkflowRequest(requestId: number): Promise<WorkflowAppRequest> {
+  //   const query = {
+  //     operationName: 'workflowRequest',
+  //     variables: { id: requestId },
+  //     query: `
+  //       query workflowRequest($id: Int!) {
+  //         workflowRequest(id: $id) {
+  //           id
+  //           isCompleted
+  //           isReceived
+  //           requestId
+  //           requestDetails
+  //           workflowRequestSteps {
+  //             id
+  //             workflowStepId
+  //             state
+  //             actionTakenBy {
+  //               fullName
+  //               userId
+  //             }
+  //           }
+  //         }
+  //       }
+  //     `,
+  //   };
+  //   const data = await this.fetchGraphQL(query);
+  //   return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
+  // }
+
   async getSingleWorkflowRequest(requestId: number): Promise<WorkflowAppRequest> {
     const query = {
       operationName: 'workflowRequest',
@@ -127,20 +156,37 @@ export class WorkflowAppService {
             requestDetails
             workflowRequestSteps {
               id
+              workflowRequestId
               workflowStepId
               state
               actionTakenBy {
                 fullName
                 userId
               }
+              workflowStep {
+                id
+                stepName
+                position
+                workflowStepActionAllowedUsers {
+                  id
+                  approverPriority
+                  user {
+                    userId
+                    fullName
+                    email
+                  }
+                }
+              }
             }
           }
         }
       `,
     };
+
     const data = await this.fetchGraphQL(query);
     return Object.assign(new WorkflowAppRequest(), data?.workflowRequest || {});
   }
+
 
   async workflowRequestByReferenceId(id: string): Promise<WorkflowAppRequest | null> {
     const query = {
