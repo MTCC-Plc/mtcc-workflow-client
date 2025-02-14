@@ -147,7 +147,6 @@ export class WorkflowAppService {
                     workflowName
                     allowMultipleApprovers
                     workflowSteps {
-                        workflowStepId
                         id
                         stepName
                         position
@@ -166,6 +165,7 @@ export class WorkflowAppService {
                 }
                 workflowRequestSteps {
                     id
+                    workflowStepId
                     actionTakenDate
                     remarks
                     state

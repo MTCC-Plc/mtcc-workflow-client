@@ -146,7 +146,6 @@ class WorkflowAppService {
                     workflowName
                     allowMultipleApprovers
                     workflowSteps {
-                        workflowStepId
                         id
                         stepName
                         position
@@ -165,6 +164,7 @@ class WorkflowAppService {
                 }
                 workflowRequestSteps {
                     id
+                    workflowStepId
                     actionTakenDate
                     remarks
                     state
