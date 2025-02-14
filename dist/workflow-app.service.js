@@ -146,6 +146,7 @@ class WorkflowAppService {
                     workflowName
                     allowMultipleApprovers
                     workflowSteps {
+                        workflowStepId
                         id
                         stepName
                         position
@@ -160,15 +161,6 @@ class WorkflowAppService {
                                 email
                             }
                         }
-                       workflow {
-                         id 
-                         workflowName
-                         workflowSteps {
-                          id
-                          stepName
-                          position
-                         }
-                       }
                     }
                 }
                 workflowRequestSteps {
