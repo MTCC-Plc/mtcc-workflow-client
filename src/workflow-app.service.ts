@@ -67,16 +67,44 @@ export class WorkflowAppService {
       operationName: 'getWorkflowsByAppID',
       variables: { id: this.appId },
       query: `
-        query getWorkflowsByAppID($id: Int!) {
-          getWorkflowsByAppID(id: $id) {
+      query getWorkflowsByAppID($id: Int!) {
+        getWorkflowsByAppID(id: $id) {
+        id
+        appId
+        workflowName
+        isActive
+        createdAt
+        updatedAt
+        allowMultipleApprovers
+        createdBy {
+          userId
+          fullName
+          email
+        }
+        workflowSteps {
+          id
+          stepName
+          position
+          description
+          workflowStepActionAllowedUsers {
             id
-            workflowName
-            workflowSteps {
+            approverPriority
+            user {
               id
-              stepName
+              fullName
+              userId
+              email
+              rcno
+            }
+            createdBy {
+              id
+              fullName
+              userId
+              email
             }
           }
         }
+      }
       `,
     };
 
